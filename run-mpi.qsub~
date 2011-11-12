@@ -1,9 +1,0 @@
-#!/bin/bash
-#
-#$ -cwd
-#$ -j y
-#$ -S /bin/bash
-#$ -pe orte 4
-#
-
-/opt/openmpi/bin/mpirun -np $NSLOTS ./path-mpi.x

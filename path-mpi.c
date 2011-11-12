@@ -41,8 +41,26 @@ int square(int n,               // Number of nodes
            int* restrict lnew)  // Partial distance at step s+1
 {
     int done = 1;
-
-    for (int j = 0; j < n; ++j) {
+    int nprocs, myrank;
+    int downlim,uplim;
+    int *sendbuff, *sendcount, *displ;
+    
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    
+    downlim = n * myrank / nprocs;
+    uplim = n * (myrank+1) / nprocs;
+    
+    sendcount = (int*) malloc(nprocs);
+    displ = (int*) malloc(nprocs);
+    for (int i = 1; i < nprocs; ++i) {
+        displ[i] = n*i/nprocs;
+        sendcount[i] = n*(n*(i+1)/nprocs-displ[i]);
+    }
+    sendbuff = (int*) malloc(sendcount[myrank]);
+    
+    
+    for (int j = downlim; j < uplim; ++j) {
         for (int i = 0; i < n; ++i) {
             int lij = lnew[j*n+i];
             for (int k = 0; k < n; ++k) {
@@ -53,9 +71,12 @@ int square(int n,               // Number of nodes
                     done = 0;
                 }
             }
-            lnew[j*n+i] = lij;
+            sendbuff[(j-downlim)*n+i] = lij;
         }
     }
+    
+    MPI_Allgatherv(sendbuff, sendcount[myrank], MPI_INT, lnew, sendcount, displ, MPI_INT, MPI_COMM_WORLD);
+ 
     return done;
 }
 
@@ -199,10 +220,10 @@ int main(int argc, char** argv)
 {
     int n    = 200;                     // Number of nodes
     double p = 0.05;                    // Edge probability
-    //const char* ifname = NULL;          // Adjacency matrix file name
-    //const char* ofname = NULL;          // Distance matrix file name
-    const char* ifname = "AdjMat.dat";    // Adjacency matrix file name
-    const char* ofname = "DistMat.dat";   // Distance matrix file name
+    const char* ifname = NULL;          // Adjacency matrix file name
+    const char* ofname = NULL;          // Distance matrix file name
+    //const char* ifname = "AdjMat.dat";    // Adjacency matrix file name
+    //const char* ofname = "DistMat.dat";   // Distance matrix file name
     
     // Option processing
     extern char* optarg;
