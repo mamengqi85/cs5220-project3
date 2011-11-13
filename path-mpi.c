@@ -59,7 +59,6 @@ int square(int n,               // Number of nodes
     }
     sendbuff = (int*) malloc(sendcount[myrank]);
     
-    
     for (int j = downlim; j < uplim; ++j) {
         for (int i = 0; i < n; ++i) {
             int lij = lnew[j*n+i];
@@ -237,18 +236,16 @@ int main(int argc, char** argv)
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     
-    if (myrank == 0) {
-        // Command line options
-        while ((c = getopt(argc, argv, optstring)) != -1) {
-            switch (c) {
-            case 'h':
-                fprintf(stderr, "%s", usage);
-                return -1;
-            case 'n': n = atoi(optarg); break;
-            case 'p': p = atof(optarg); break;
-            case 'o': ofname = optarg;  break;
-            case 'i': ifname = optarg;  break;
-            }
+    // Command line options
+    while ((c = getopt(argc, argv, optstring)) != -1) {
+        switch (c) {
+        case 'h':
+           fprintf(stderr, "%s", usage);
+           return -1;
+        case 'n': n = atoi(optarg); break;
+        case 'p': p = atof(optarg); break;
+        case 'o': ofname = optarg;  break;
+        case 'i': ifname = optarg;  break;
         }
     }
     

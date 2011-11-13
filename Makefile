@@ -42,6 +42,8 @@ path-omp.tex: path-omp.c
 clean:
 	rm -f *.o 
 	rm -f main.aux main.log main.out
+	rm -f *~
+	rm -f run-*.qsub.*
 
 realclean: clean
 	rm -f path-omp.x path-mpi.x path-omp.tex main.pdf
